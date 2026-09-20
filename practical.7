@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive FAQ</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-r from-red-600 to-yellow-400 flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-96">
+
+        <h2 class="text-2xl font-bold text-center text-red-600 mb-6">
+            Student Study Portal
+        </h2>
+
+        <p class="text-center mb-5 text-yellow-600">
+            How Can We Help You?
+        </p>
+
+        <!-- FAQ 1 -->
+        <div class="mb-3">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                Where can I find CSE notes?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                You can find subject-wise notes for Programming, DBMS, Data Structures, Computer Networks, and other CSE subjects.
+            </p>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="mb-3">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                How can I learn programming?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Start with C or Python, learn basic concepts, and practice small programs regularly.
+            </p>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="mb-3">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                 Where can I practice coding?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                You can practice coding on platforms like HackerRank, LeetCode, CodeChef, and GeeksforGeeks.
+            </p>
+        </div>
+
+        <!-- FAQ 4-->
+        <div class="mb-4">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                How can I prepare for CSE exams?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Study important concepts, revise notes, solve previous-year questions, and practice programming problems.
+            </p>
+        </div>
+
+        <div class="mb-5">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                How can I fix coding errors?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Read the error message carefully, check the line mentioned, and debug your code step by step.
+            </p>
+        </div>
+
+        <div class="mb-6">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                How can I improve my programming skills?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Practice coding daily, build small projects, solve problems, and learn from your mistakes.
+            </p>
+        </div>
+
+        <div class="mb-7">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                How can I prepare for placements?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Focus on programming, Data Structures & Algorithms, aptitude, communication skills, projects, and interview preparation.
+        </div>
+
+        <div class="mb-8">
+            <button class="question w-full text-left p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded">
+                 Which programming language should I learn first?
+            </button>
+
+            <p class="answer hidden p-3 bg-purple-50">
+                Beginners can start with C, C++, or Python. Choose one language and build a strong foundation before learning many languages.
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Get all questions
+        let questions = document.querySelectorAll(".question");
+
+        // Add click event to each question
+        questions.forEach(function(question) {
+
+            question.addEventListener("click", function() {
+
+                // Get the answer
+                let answer = question.nextElementSibling;
+
+                // Show / Hide answer
+                answer.classList.toggle("hidden");
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>
