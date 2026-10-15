@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart To-Do List</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .completed span {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <header class="bg-indigo-600 text-white text-center p-6 shadow">
+        <h1 class="text-3xl font-bold">Smart To-Do List</h1>
+        <p class="mt-2">Organize your day, one task at a time.</p>
+    </header>
+
+    <main class="max-w-2xl mx-auto p-4 sm:p-6">
+
+        <section class="bg-white rounded-xl shadow-md p-5 mb-6">
+            <h2 class="text-xl font-bold mb-4">Add a New Task</h2>
+
+            <form id="taskForm" class="space-y-3">
+                <input
+                    id="taskInput"
+                    type="text"
+                    placeholder="Enter your task..."
+                    required
+                    maxlength="150"
+                    class="w-full border rounded-lg p-3 focus:outline-none
+                           focus:ring-2 focus:ring-indigo-500"
+                >
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <select
+                        id="priorityInput"
+                        class="border rounded-lg p-3 flex-1 bg-white"
+                    >
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium" selected>Medium Priority</option>
+                        <option value="High">High Priority</option>
+                    </select>
+
+                    <button
+                        type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700
+                               text-white font-semibold rounded-lg px-6 py-3"
+                    >
+                        + Add Task
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="grid grid-cols-3 gap-3 mb-6 text-center">
+            <div class="bg-white rounded-lg shadow p-4">
+                <p class="text-gray-500 text-sm">Total</p>
+                <p id="totalCount" class="text-2xl font-bold text-indigo-600">0</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4">
+                <p class="text-gray-500 text-sm">Pending</p>
+                <p id="pendingCount" class="text-2xl font-bold text-orange-500">0</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4">
+                <p class="text-gray-500 text-sm">Completed</p>
+                <p id="completedCount" class="text-2xl font-bold text-green-600">0</p>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-md p-5">
+            <div class="flex flex-col sm:flex-row justify-between
+                        items-start sm:items-center gap-3 mb-5">
+
+                <h2 class="text-xl font-bold">My Tasks</h2>
+
+                <select
+                    id="filterInput"
+                    class="border rounded-lg p-2 bg-white"
+                    aria-label="Filter tasks"
+                >
+                    <option value="All">All Tasks</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+
+            <ul id="taskList" class="space-y-3"></ul>
+
+            <p id="emptyMessage" class="text-center text-gray-400 py-8">
+                No tasks yet. Add your first task!
+            </p>
+
+            <button
+                id="clearCompleted"
+                type="button"
+                class="mt-4 text-sm text-red-600 hover:text-red-800"
+            >
+                Clear Completed Tasks
+            </button>
+        </section>
+
+        <footer class="text-center text-gray-500 text-sm mt-6">
+            Stay focused. Get things done!
+        </footer>
+
+    </main>
+
+    <script>
+        const taskForm = document.getElementById("taskForm");
+        const taskInput = document.getElementById("taskInput");
+        const priorityInput = document.getElementById("priorityInput");
+        const filterInput = document.getElementById("filterInput");
+        const taskList = document.getElementById("taskList");
+        const emptyMessage = document.getElementById("emptyMessage");
+
+        let tasks = [];
+
+        try {
+            const savedTasks = JSON.parse(
+                localStorage.getItem("smartTasks") || "[]"
+            );
+
+            if (Array.isArray(savedTasks)) {
+                tasks = savedTasks.filter(task =>
+                    task &&
+                    typeof task.id === "string" &&
+                    typeof task.text === "string" &&
+                    typeof task.completed === "boolean" &&
+                    ["Low", "Medium", "High"].includes(task.priority)
+                );
+            }
+        } catch (error) {
+            tasks = [];
+        }
+
+        function saveTasks() {
+            try {
+                localStorage.setItem("smartTasks", JSON.stringify(tasks));
+            } catch (error) {
+                alert("Unable to save tasks in this browser.");
+            }
+        }
+
+        function updateCounts() {
+            document.getElementById("totalCount").textContent = tasks.length;
+
+            document.getElementById("pendingCount").textContent =
+                tasks.filter(task => !task.completed).length;
+
+            document.getElementById("completedCount").textContent =
+                tasks.filter(task => task.completed).length;
+        }
+
+        function renderTasks() {
+            taskList.replaceChildren();
+
+            const filter = filterInput.value;
+
+            const filteredTasks = tasks.filter(task => {
+                if (filter === "Pending") return !task.completed;
+                if (filter === "Completed") return task.completed;
+                return true;
+            });
+
+            emptyMessage.classList.toggle(
+                "hidden",
+                filteredTasks.length > 0
+            );
+
+            emptyMessage.textContent = tasks.length === 0
+                ? "No tasks yet. Add your first task!"
+                : "No tasks found in this category.";
+
+            filteredTasks.forEach(task => {
+                const item = document.createElement("li");
+
+                item.className =
+                    "flex flex-col sm:flex-row sm:items-center " +
+                    "justify-between gap-3 border rounded-lg p-3 " +
+                    "hover:bg-gray-50 " +
+                    (task.completed ? "completed" : "");
+
+                const left = document.createElement("div");
+                left.className = "flex items-start gap-3 min-w-0";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = task.completed;
+                checkbox.className = "mt-1 h-4 w-4 accent-indigo-600";
+                checkbox.setAttribute("aria-label", "Mark task completed");
+
+                checkbox.addEventListener("change", () => {
+                    task.completed = checkbox.checked;
+                    saveTasks();
+                    renderTasks();
+                });
+
+                const details = document.createElement("div");
+                details.className = "min-w-0";
+
+                const title = document.createElement("span");
+                title.className = "block font-medium break-words";
+                title.textContent = task.text;
+
+                const priority = document.createElement("p");
+                priority.className = "text-xs mt-1";
+
+                const priorityColors = {
+                    Low: "text-green-600",
+                    Medium: "text-yellow-600",
+                    High: "text-red-600"
+                };
+
+                priority.classList.add(priorityColors[task.priority]);
+                priority.textContent = task.priority + " Priority";
+
+                details.append(title, priority);
+                left.append(checkbox, details);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.textContent = "Delete";
+                deleteButton.className =
+                    "self-start sm:self-center text-red-600 " +
+                    "hover:bg-red-50 rounded px-3 py-1";
+
+                deleteButton.setAttribute("aria-label", "Delete task");
+
+                deleteButton.addEventListener("click", () => {
+                    tasks = tasks.filter(item => item.id !== task.id);
+                    saveTasks();
+                    renderTasks();
+                });
+
+                item.append(left, deleteButton);
+                taskList.appendChild(item);
+            });
+
+            updateCounts();
+        }
+
+        taskForm.addEventListener("submit", event => {
+            event.preventDefault();
+
+            const text = taskInput.value.trim();
+
+            if (!text) {
+                taskInput.focus();
+                return;
+            }
+
+            tasks.push({
+                id: crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : Date.now().toString() + Math.random().toString(36),
+                text: text,
+                priority: priorityInput.value,
+                completed: false
+            });
+
+            saveTasks();
+            taskInput.value = "";
+            priorityInput.value = "Medium";
+            taskInput.focus();
+
+            renderTasks();
+        });
+
+        filterInput.addEventListener("change", renderTasks);
+
+        document.getElementById("clearCompleted")
+            .addEventListener("click", () => {
+                tasks = tasks.filter(task => !task.completed);
+                saveTasks();
+                renderTasks();
+            });
+
+        renderTasks();
+    </script>
+
+</body>
+</html>
